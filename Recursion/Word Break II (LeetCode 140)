@@ -1,0 +1,60 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+/**
+ * Function to recursively find all sentences from s using words in wordDict
+ * @param s: the remaining string
+ * @param wordDict: set of valid words
+ * @param memo: memoization map to store already computed results
+ * @return: vector of strings containing all possible sentences
+ */
+vector<string> wordBreakHelper(string s, unordered_set<string>& wordDict, unordered_map<string, vector<string>>& memo) {
+    if (memo.find(s) != memo.end()) {
+        return memo[s]; // Return already computed results
+    }
+
+    vector<string> res;
+    if (s.empty()) {
+        res.push_back(""); // Base case: empty string
+        return res;
+    }
+
+    for (int i = 1; i <= s.size(); i++) {
+        string prefix = s.substr(0, i);
+        if (wordDict.count(prefix)) { // Check if prefix is a valid word
+            string suffix = s.substr(i);
+            vector<string> suffixWays = wordBreakHelper(suffix, wordDict, memo); // Recurse on remaining string
+            for (auto &str : suffixWays) {
+                string space = str.empty() ? "" : " ";
+                res.push_back(prefix + space + str);
+            }
+        }
+    }
+
+    memo[s] = res; // Store in memo for future calls
+    return res;
+}
+
+/**
+ * Main function to call helper
+ */
+vector<string> wordBreak(string s, vector<string>& wordDictVec) {
+    unordered_set<string> wordDict(wordDictVec.begin(), wordDictVec.end());
+    unordered_map<string, vector<string>> memo;
+    return wordBreakHelper(s, wordDict, memo);
+}
+
+// Driver Code
+int main() {
+    string s = "catsanddog";
+    vector<string> wordDict = {"cat", "cats", "and", "sand", "dog"};
+
+    vector<string> result = wordBreak(s, wordDict);
+
+    cout << "All possible sentences:\n";
+    for (string sentence : result) {
+        cout << sentence << endl;
+    }
+
+    return 0;
+}
